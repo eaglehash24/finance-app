@@ -1,0 +1,11 @@
+{
+  "name": "Учёт финансов",
+  "short_name": "Финансы",
+  "description": "Умный учёт доходов и расходов",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#667eea",
+  "orientation": "portrait",
+  "icons": []
+}
