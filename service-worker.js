@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finance-app-v1';
+const CACHE_NAME = 'finance-app-v2';
 const urlsToCache = ['./', './index.html', './manifest.json'];
 self.addEventListener('install', event => {
   event.waitUntil(
