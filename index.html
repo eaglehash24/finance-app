@@ -547,10 +547,39 @@ loadMonth();
 addMessage('Бот', '💵 Начальный баланс: ' + formatAmount(value));
 }
 
+// Регистрация Service Worker с автообновлением
 if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('service-worker.js')
-.then(() => console.log('SW registered'))
-.catch(err => console.log('SW failed', err));
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(reg => {
+        console.log('SW registered:', reg);
+        
+        // Проверяем обновления при каждом открытии
+        reg.update();
+        
+        // Если есть новый worker — активируем его
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          console.log('Найден новый worker');
+          
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('Новая версия готова!');
+              // Автоматически перезагружаем страницу с новой версией
+              window.location.reload();
+            }
+          });
+        });
+      })
+      .catch(err => console.log('SW registration failed:', err));
+  });
+  
+  // Сообщаем worker о необходимости проверки обновлений
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data === 'reload') {
+      window.location.reload();
+    }
+  });
 }
 </script>
 </body>
