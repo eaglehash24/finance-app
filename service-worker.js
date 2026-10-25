@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finance-app-v12';
+const CACHE_NAME = 'finance-app-v13';
 const urlsToCache = ['./', './index.html', './manifest.json'];
 
 // При установке — сразу активируем новый worker
