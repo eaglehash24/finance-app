@@ -21,8 +21,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,7 +28,7 @@ body {
   font-family: 'Inter', sans-serif; 
   background: #0F0F14; 
   color: #fff; 
-  width: 100%; /* Растягиваем на всю ширину */
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto; 
   padding: 20px; 
@@ -41,98 +39,69 @@ body {
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .month-display { font-size: 20px; font-weight: 700; }
 .month-select { 
-  padding: 8px; 
-  background: rgba(255,255,255,0.05); 
-  border: 1px solid rgba(255,255,255,0.1); 
-  border-radius: 10px; 
-  color: white; 
-  display: none; 
-  appearance: none;
-  -webkit-appearance: none;
+  padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+  border-radius: 10px; color: white; display: none; appearance: none; -webkit-appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 16px;
-  padding-right: 30px;
+  background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; padding-right: 30px;
 }
 .menu-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px; color: white; cursor: pointer; }
 
 /* Баланс */
 .balance-card {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px;
-  padding: 25px;
-  margin-bottom: 20px;
-  text-align: center;
-  width: 100%; /* Гарантируем одинаковую ширину */
+  background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 25px; margin-bottom: 20px; text-align: center; width: 100%;
 }
 .balance-header { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px; }
 .balance-label { font-size: 12px; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 .curr-selector { 
-  background: transparent; 
-  border: 1px solid #667eea; 
-  color: #667eea; 
-  padding: 2px 8px; 
-  border-radius: 5px; 
-  font-size: 12px; 
-  cursor: pointer; 
-  appearance: none;
-  -webkit-appearance: none;
+  background: transparent; border: 1px solid #667eea; color: #667eea; padding: 2px 8px; border-radius: 5px; 
+  font-size: 12px; cursor: pointer; appearance: none; -webkit-appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 5px center;
-  background-size: 12px;
-  padding-right: 20px;
+  background-repeat: no-repeat; background-position: right 5px center; background-size: 12px; padding-right: 20px;
 }
-.balance-value {
-  font-size: 32px;
-  font-weight: 700;
-  color: #00FF88;
-  margin-bottom: 15px;
-  text-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
-}
+.balance-value { font-size: 32px; font-weight: 700; color: #00FF88; margin-bottom: 15px; text-shadow: 0 0 15px rgba(0, 255, 136, 0.2); }
 .balance-details { display: flex; justify-content: center; gap: 20px; font-size: 14px; color: #aaa; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
 
 /* Кнопки добавления */
-.quick-add-container {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 30px;
-  width: 100%;
-}
+.quick-add-container { display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; width: 100%; }
 .add-btn-main {
-  width: 100%;
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 14px;
+  width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px;
 }
 .add-btn-main.exp { background: rgba(255, 107, 107, 0.1); color: #FF6B6B; border: 1px solid #FF6B6B; }
 .add-btn-main.inc { background: rgba(0, 255, 136, 0.1); color: #00FF88; border: 1px solid #00FF88; }
 
-/* Графики */
+/* Графики и Списки */
 .charts-wrapper { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 15px; width: 100%; }
 .chart-section { 
-  background: rgba(255,255,255,0.05); 
-  backdrop-filter: blur(20px); 
-  border: 1px solid rgba(255,255,255,0.1); 
-  border-radius: 16px; 
-  padding: 20px; 
-  width: 100%; /* Гарантируем одинаковую ширину */
+  background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); 
+  border-radius: 16px; padding: 20px; width: 100%;
 }
-.chart-currency-filter { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+.chart-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+.chart-currency-filter { display: flex; gap: 5px; }
 .curr-filter-btn { padding: 5px 10px; background: rgba(255,255,255,0.05); border-radius: 5px; cursor: pointer; font-size: 12px; color: #888; }
 .curr-filter-btn.active { background: #667eea; color: white; }
-.chart-container { height: 250px; position: relative; }
+.category-select { 
+  padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+  border-radius: 8px; color: white; font-size: 13px; max-width: 200px;
+}
+.chart-container { height: 200px; position: relative; margin-bottom: 20px; }
+
+/* Список транзакций под графиком */
+.tx-list-container {
+  max-height: 300px;
+  overflow-y: auto;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 15px;
+}
+.tx-item { 
+  background: rgba(255,255,255,0.03); padding: 10px; margin-bottom: 8px; border-radius: 8px; 
+  display: flex; justify-content: space-between; align-items: center;
+}
+.tx-info b { display: block; margin-bottom: 2px; }
+.tx-info span { font-size: 11px; color: #888; }
+.tx-actions { display: flex; gap: 10px; }
+.action-icon { width: 16px; height: 16px; cursor: pointer; }
 
 /* Модалки */
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
@@ -149,12 +118,8 @@ body {
 .dropdown-menu.active { display: block; }
 .dropdown-item { padding: 12px 16px; display: flex; align-items: center; gap: 10px; color: #ccc; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-@media (min-width: 769px) { 
-  .charts-wrapper { grid-template-columns: 1fr 1fr; } 
-}
-@media (max-width: 768px) { 
-  body { max-width: 100%; }
-}
+@media (min-width: 769px) { .charts-wrapper { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 768px) { body { max-width: 100%; } }
 </style>
 </head>
 <body>
@@ -191,25 +156,44 @@ body {
   <button class="add-btn-main inc" onclick="openTxModal('income')"><i data-lucide="plus-circle"></i> Добавить доход</button>
 </div>
 
-<!-- Графики -->
+<!-- Графики и Списки -->
 <div class="charts-wrapper">
+  <!-- РАСХОДЫ -->
   <div class="chart-section">
-    <h3 style="margin-bottom:15px; text-align:center;">Расходы</h3>
-    <div class="chart-currency-filter">
-      <div class="curr-filter-btn active" onclick="setChartCurr('expense','UAH')">UAH</div>
-      <div class="curr-filter-btn" onclick="setChartCurr('expense','USD')">USD</div>
-      <div class="curr-filter-btn" onclick="setChartCurr('expense','EUR')">EUR</div>
+    <div class="chart-controls">
+      <h3>Расходы</h3>
+      <div class="chart-currency-filter">
+        <div class="curr-filter-btn active" onclick="setChartCurr('expense','UAH')">UAH</div>
+        <div class="curr-filter-btn" onclick="setChartCurr('expense','USD')">USD</div>
+        <div class="curr-filter-btn" onclick="setChartCurr('expense','EUR')">EUR</div>
+      </div>
     </div>
+    
+    <select class="category-select" id="exp-cat-select" onchange="handleCategorySelect('expense')">
+      <option value="">📊 Все категории (График)</option>
+    </select>
+
     <div class="chart-container"><canvas id="expChart"></canvas></div>
+    <div id="exp-list" class="tx-list-container" style="display:none;"></div>
   </div>
+
+  <!-- ДОХОДЫ -->
   <div class="chart-section">
-    <h3 style="margin-bottom:15px; text-align:center;">Доходы</h3>
-    <div class="chart-currency-filter">
-      <div class="curr-filter-btn active" onclick="setChartCurr('income','UAH')">UAH</div>
-      <div class="curr-filter-btn" onclick="setChartCurr('income','USD')">USD</div>
-      <div class="curr-filter-btn" onclick="setChartCurr('income','EUR')">EUR</div>
+    <div class="chart-controls">
+      <h3>Доходы</h3>
+      <div class="chart-currency-filter">
+        <div class="curr-filter-btn active" onclick="setChartCurr('income','UAH')">UAH</div>
+        <div class="curr-filter-btn" onclick="setChartCurr('income','USD')">USD</div>
+        <div class="curr-filter-btn" onclick="setChartCurr('income','EUR')">EUR</div>
+      </div>
     </div>
+
+    <select class="category-select" id="inc-cat-select" onchange="handleCategorySelect('income')">
+      <option value="">📊 Все категории (График)</option>
+    </select>
+
     <div class="chart-container"><canvas id="incChart"></canvas></div>
+    <div id="inc-list" class="tx-list-container" style="display:none;"></div>
   </div>
 </div>
 
@@ -266,21 +250,6 @@ body {
   </div>
 </div>
 
-<!-- Модалка Детализации Графика -->
-<div class="modal" id="chart-detail-modal">
-  <div class="modal-content">
-    <span class="close-modal" onclick="closeModal('chart-detail-modal')"><i data-lucide="x"></i></span>
-    <h2 id="detail-title">Детализация</h2>
-    <div class="period-filter" style="margin:15px 0; display:flex; gap:5px;">
-      <button class="filter-btn active" onclick="setDetailFilter('all')" style="padding:5px 10px; background:rgba(255,255,255,0.1); border-radius:5px; color:white; border:none; cursor:pointer;">Все</button>
-      <button class="filter-btn" onclick="setDetailFilter('today')" style="padding:5px 10px; background:rgba(255,255,255,0.05); border-radius:5px; color:#888; border:none; cursor:pointer;">Сегодня</button>
-      <button class="filter-btn" onclick="setDetailFilter('week')" style="padding:5px 10px; background:rgba(255,255,255,0.05); border-radius:5px; color:#888; border:none; cursor:pointer;">Неделя</button>
-      <button class="filter-btn" onclick="setDetailFilter('month')" style="padding:5px 10px; background:rgba(255,255,255,0.05); border-radius:5px; color:#888; border:none; cursor:pointer;">Месяц</button>
-    </div>
-    <div id="detail-list"></div>
-  </div>
-</div>
-
 <script>
 let allData = JSON.parse(localStorage.getItem('finData')) || {};
 let balances = JSON.parse(localStorage.getItem('finBal')) || {USD:0, UAH:0, EUR:0};
@@ -288,8 +257,6 @@ let rates = JSON.parse(localStorage.getItem('finRates')) || {USD:41.5, EUR:45.0,
 let currentMonth = new Date().toISOString().slice(0, 7);
 let chartCurr = {expense: 'UAH', income: 'UAH'};
 let expChart = null, incChart = null;
-let detailCategory = '';
-let detailType = '';
 
 const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const expCats = ['Еда','Транспорт','Жильё','Здоровье','Развлечения','Одежда','Подарки','Прочее'];
@@ -315,14 +282,12 @@ function formatMoney(amount, curr) {
 function updateBalanceUI() {
   const txs = allData[currentMonth] || [];
   const targetCurr = document.getElementById('balance-curr-select').value;
-  
   let totalInTarget = 0;
   
   ['USD','UAH','EUR'].forEach(c => {
     const income = txs.filter(t => t.type === 'income' && t.currency === c).reduce((s,t)=>s+t.amount,0);
     const expense = txs.filter(t => t.type === 'expense' && t.currency === c).reduce((s,t)=>s+t.amount,0);
     const net = balances[c] + income - expense;
-    
     let val = net;
     if(targetCurr === 'UAH') {
       if(c === 'USD') val = net * rates.USD;
@@ -338,7 +303,6 @@ function updateBalanceUI() {
   });
 
   document.getElementById('balance-main').textContent = formatMoney(totalInTarget, targetCurr);
-  
   const detailsDiv = document.getElementById('balance-details');
   let html = '';
   ['USD','UAH','EUR'].forEach(c => {
@@ -357,7 +321,6 @@ function updateMonthUI() {
   const selectEl = document.getElementById('month-select');
   const [y, m] = currentMonth.split('-');
   textEl.textContent = `${monthNames[parseInt(m)-1]} ${y}`;
-  
   if(months.length > 1) {
     textEl.style.display = 'none';
     selectEl.style.display = 'block';
@@ -393,13 +356,11 @@ function openTxModal(type, editId = null) {
   catSelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('') + '<option value="__NEW__">➕ Создать свою...</option>';
   
   if(editId) {
-    // Ищем запись во всех месяцах
     let foundTx = null;
     Object.values(allData).forEach(monthTxs => {
       const tx = monthTxs.find(t => t.id == editId);
       if(tx) foundTx = tx;
     });
-
     if(foundTx) {
       document.getElementById('tx-curr').value = foundTx.currency;
       document.getElementById('tx-cat').value = foundTx.category;
@@ -412,7 +373,6 @@ function openTxModal(type, editId = null) {
     document.getElementById('tx-new-cat').style.display = 'none';
     document.getElementById('tx-date').valueAsDate = new Date();
   }
-  
   document.getElementById('tx-modal').classList.add('active');
   setTimeout(() => document.getElementById('tx-input').focus(), 100);
 }
@@ -423,9 +383,7 @@ function checkNewCatModal() {
   input.style.display = select.value === '__NEW__' ? 'block' : 'none';
 }
 
-function handleModalEnter(e) {
-  if(e.key === 'Enter') saveTransaction();
-}
+function handleModalEnter(e) { if(e.key === 'Enter') saveTransaction(); }
 
 function parseInput(text) {
   const match = text.match(/(\d+[\.,]?\d*)/);
@@ -459,26 +417,17 @@ function saveTransaction() {
     const txs = allData[txMonth] || [];
     const income = txs.filter(t => t.type === 'income' && t.currency === curr).reduce((s,t)=>s+t.amount,0);
     const expense = txs.filter(t => t.type === 'expense' && t.currency === curr).reduce((s,t)=>s+t.amount,0);
-    if ((balances[curr] + income - expense) < amount) {
-      return alert(`Недостаточно средств в ${curr}!`);
-    }
+    if ((balances[curr] + income - expense) < amount) return alert(`Недостаточно средств в ${curr}!`);
   }
 
-  const txObj = { 
-    id: editId ? parseInt(editId) : Date.now(), 
-    type, amount, currency: curr, category, description: desc, 
-    date: dateVal ? new Date(dateVal).toISOString() : new Date().toISOString() 
-  };
+  const txObj = { id: editId ? parseInt(editId) : Date.now(), type, amount, currency: curr, category, description: desc, date: dateVal ? new Date(dateVal).toISOString() : new Date().toISOString() };
   
   if(editId) {
     Object.keys(allData).forEach(m => {
       const idx = allData[m].findIndex(t => t.id == editId);
       if(idx !== -1) {
         allData[m][idx] = txObj;
-        if(m !== txMonth) {
-          allData[m].splice(idx, 1);
-          allData[txMonth].push(txObj);
-        }
+        if(m !== txMonth) { allData[m].splice(idx, 1); allData[txMonth].push(txObj); }
       }
     });
   } else {
@@ -487,23 +436,77 @@ function saveTransaction() {
 
   localStorage.setItem('finData', JSON.stringify(allData));
   if(txMonth !== currentMonth) currentMonth = txMonth;
-  
   closeModal('tx-modal');
   init();
 }
 
-// --- ГРАФИКИ ---
+// --- ГРАФИКИ И СПИСКИ ---
 function setChartCurr(type, c) {
   chartCurr[type] = c;
   const container = event.target.parentElement;
   Array.from(container.children).forEach(b => b.classList.remove('active'));
   event.target.classList.add('active');
+  // Сбрасываем выбор категории при смене валюты
+  document.getElementById(type === 'expense' ? 'exp-cat-select' : 'inc-cat-select').value = "";
   updateCharts();
 }
 
 function updateCharts() {
   renderChart('expense', 'expChart', expChart, (c) => expChart = c);
   renderChart('income', 'incChart', incChart, (c) => incChart = c);
+  updateCategorySelectors();
+}
+
+function updateCategorySelectors() {
+  ['expense', 'income'].forEach(type => {
+    const txs = (allData[currentMonth] || []).filter(t => t.type === type && t.currency === chartCurr[type]);
+    const cats = [...new Set(txs.map(t => t.category))];
+    const select = document.getElementById(type === 'expense' ? 'exp-cat-select' : 'inc-cat-select');
+    const currentVal = select.value;
+    
+    select.innerHTML = '<option value="">📊 Все категории (График)</option>';
+    cats.forEach(c => {
+      select.innerHTML += `<option value="${c}">${c}</option>`;
+    });
+    select.value = currentVal; // Сохраняем выбор если категория еще есть
+  });
+}
+
+function handleCategorySelect(type) {
+  const select = document.getElementById(type === 'expense' ? 'exp-cat-select' : 'inc-cat-select');
+  const listContainer = document.getElementById(type === 'expense' ? 'exp-list' : 'inc-list');
+  const chartCanvas = document.getElementById(type === 'expense' ? 'expChart' : 'incChart');
+  
+  if(select.value) {
+    // Показываем список, скрываем график (или оставляем, но список важнее)
+    listContainer.style.display = 'block';
+    renderList(type, select.value, listContainer);
+  } else {
+    listContainer.style.display = 'none';
+  }
+}
+
+function renderList(type, category, container) {
+  const txs = (allData[currentMonth] || []).filter(t => t.type === type && t.category === category && t.currency === chartCurr[type]);
+  
+  if(txs.length === 0) { container.innerHTML = '<div style="color:#666; text-align:center; padding:10px;">Нет записей</div>'; return; }
+  
+  container.innerHTML = txs.map(t => `
+    <div class="tx-item">
+      <div class="tx-info">
+        <b>${t.description}</b>
+        <span>${new Date(t.date).toLocaleDateString()}</span>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-weight:700; color:${type==='expense'?'#FF6B6B':'#00FF88'}">${formatMoney(t.amount, t.currency)}</div>
+        <div class="tx-actions">
+           <i data-lucide="pencil" class="action-icon" style="color:#667eea" onclick="openTxModal('${t.type}', ${t.id})"></i>
+           <i data-lucide="trash-2" class="action-icon" style="color:#FF6B6B" onclick="deleteTx(${t.id})"></i>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  lucide.createIcons();
 }
 
 function renderChart(type, canvasId, chartInstance, setChart) {
@@ -526,62 +529,9 @@ function renderChart(type, canvasId, chartInstance, setChart) {
       labels: labels, 
       datasets: [{ data: Object.values(byCat), backgroundColor: ['#667eea','#764ba2','#00FF88','#FF6B6B','#FFC107','#00BCD4'], borderWidth: 0 }] 
     },
-    options: { 
-      responsive: true, maintainAspectRatio: false, 
-      onClick: (e, elements) => {
-        if(elements.length > 0) {
-          const index = elements[0].index;
-          const catName = Object.keys(byCat)[index];
-          openChartDetail(catName, type);
-        }
-      },
-      plugins: { legend: { position:'bottom', labels:{color:'#fff'} } } 
-    }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position:'bottom', labels:{color:'#fff'} } } }
   });
   setChart(newChart);
-}
-
-// --- ДЕТАЛИЗАЦИЯ ---
-function openChartDetail(cat, type) {
-  detailCategory = cat;
-  detailType = type;
-  document.getElementById('detail-title').textContent = `${cat} (${type === 'expense' ? 'Расходы' : 'Доходы'})`;
-  setDetailFilter('all');
-  document.getElementById('chart-detail-modal').classList.add('active');
-}
-
-function setDetailFilter(period) {
-  document.querySelectorAll('#chart-detail-modal .filter-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  
-  const now = new Date();
-  const txs = (allData[currentMonth] || []).filter(t => {
-    if(t.category !== detailCategory || t.type !== detailType) return false;
-    const d = new Date(t.date);
-    if(period === 'today') return d.toDateString() === now.toDateString();
-    if(period === 'month') return d.getMonth() === now.getMonth();
-    if(period === 'week') { const w = new Date(now); w.setDate(w.getDate()-7); return d >= w; }
-    return true;
-  });
-
-  const list = document.getElementById('detail-list');
-  if(txs.length === 0) { list.innerHTML = '<div style="color:#666">Нет записей</div>'; return; }
-  
-  list.innerHTML = txs.map(t => {
-    return `
-      <div class="tx-mini" style="background:rgba(255,255,255,0.03); padding:10px; margin-bottom:5px; border-radius:8px;">
-        <div style="display:flex; justify-content:space-between;">
-          <b>${t.description}</b>
-          <span>${formatMoney(t.amount, t.currency)}</span>
-        </div>
-        <div style="font-size:11px; color:#888; margin-top:4px;">${new Date(t.date).toLocaleDateString()} • ${t.category}</div>
-        <div style="display:flex; gap:10px; margin-top:5px;">
-           <i data-lucide="pencil" style="width:14px; color:#667eea; cursor:pointer;" onclick="openTxModal('${t.type}', ${t.id}); closeModal('chart-detail-modal')"></i>
-           <i data-lucide="trash-2" style="width:14px; color:#FF6B6B; cursor:pointer;" onclick="deleteTx(${t.id})"></i>
-        </div>
-      </div>`;
-  }).join('');
-  lucide.createIcons();
 }
 
 // --- УТИЛИТЫ ---
@@ -614,14 +564,9 @@ function saveBalances() {
 
 function deleteTx(id) {
   if(!confirm('Удалить запись?')) return;
-  Object.keys(allData).forEach(m => {
-    allData[m] = allData[m].filter(t => t.id !== id);
-  });
+  Object.keys(allData).forEach(m => { allData[m] = allData[m].filter(t => t.id !== id); });
   localStorage.setItem('finData', JSON.stringify(allData));
   init();
-  if(document.getElementById('chart-detail-modal').classList.contains('active')) {
-    setDetailFilter('all'); 
-  }
 }
 
 function resetMonth() {
@@ -636,21 +581,12 @@ function resetMonth() {
 }
 
 function exportToCSV() {
-  let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // BOM для кириллицы в Excel
+  let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
   csvContent += "Дата;Тип;Категория;Описание;Сумма;Валюта\n";
-  
   (allData[currentMonth]||[]).forEach(t => {
-    const row = [
-      new Date(t.date).toLocaleDateString(),
-      t.type === 'expense' ? 'Расход' : 'Доход',
-      t.category,
-      t.description,
-      t.amount.toFixed(2).replace('.', ','),
-      t.currency
-    ].join(";");
+    const row = [new Date(t.date).toLocaleDateString(), t.type === 'expense' ? 'Расход' : 'Доход', t.category, t.description, t.amount.toFixed(2).replace('.', ','), t.currency].join(";");
     csvContent += row + "\n";
   });
-  
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
