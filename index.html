@@ -52,20 +52,20 @@ body {
   padding: 25px;
   margin-bottom: 20px;
   text-align: center;
-  cursor: pointer;
 }
-.balance-label { font-size: 12px; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.balance-header { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px; }
+.balance-label { font-size: 12px; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.curr-selector { background: transparent; border: 1px solid #667eea; color: #667eea; padding: 2px 8px; border-radius: 5px; font-size: 12px; cursor: pointer; }
 .balance-value {
   font-size: 32px;
   font-weight: 700;
-  color: #00FF88; /* Сплошной зеленый */
-  margin-bottom: 5px;
+  color: #00FF88;
+  margin-bottom: 15px;
   text-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
 }
-.balance-details { display: none; justify-content: center; gap: 20px; margin-top: 15px; font-size: 14px; color: #aaa; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
-.balance-details.active { display: flex; }
+.balance-details { display: flex; justify-content: center; gap: 20px; font-size: 14px; color: #aaa; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
 
-/* Кнопки добавления (так как списков на главном экране нет) */
+/* Кнопки добавления */
 .quick-add-container {
   display: flex;
   justify-content: center;
@@ -73,13 +73,15 @@ body {
   margin-bottom: 30px;
 }
 .add-btn-main {
-  padding: 12px 24px;
+  width: 100%; /* На всю ширину */
+  padding: 14px;
   border-radius: 12px;
   border: none;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   font-size: 14px;
 }
@@ -87,14 +89,12 @@ body {
 .add-btn-main.inc { background: rgba(0, 255, 136, 0.1); color: #00FF88; border: 1px solid #00FF88; }
 
 /* Графики */
-.chart-section { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; margin-bottom: 15px; }
-.chart-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-.chart-tab { flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: none; border-radius: 10px; color: #888; cursor: pointer; font-weight: 600; }
-.chart-tab.active { background: rgba(102, 126, 234, 0.2); color: #667eea; border: 1px solid rgba(102, 126, 234, 0.4); }
+.charts-wrapper { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 15px; }
+.chart-section { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; }
 .chart-currency-filter { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
 .curr-filter-btn { padding: 5px 10px; background: rgba(255,255,255,0.05); border-radius: 5px; cursor: pointer; font-size: 12px; color: #888; }
 .curr-filter-btn.active { background: #667eea; color: white; }
-.chart-container { height: 300px; position: relative; }
+.chart-container { height: 250px; position: relative; }
 
 /* Модалки */
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
@@ -111,6 +111,9 @@ body {
 .dropdown-menu.active { display: block; }
 .dropdown-item { padding: 12px 16px; display: flex; align-items: center; gap: 10px; color: #ccc; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
+@media (min-width: 769px) { 
+  .charts-wrapper { grid-template-columns: 1fr 1fr; } 
+}
 @media (max-width: 768px) { 
   body { max-width: 100%; }
 }
@@ -131,31 +134,45 @@ body {
 </div>
 
 <!-- Баланс -->
-<div class="balance-card" onclick="toggleBalanceDetails()">
-  <div class="balance-label">Общий баланс (UAH)</div>
+<div class="balance-card">
+  <div class="balance-header">
+    <div class="balance-label">Общий баланс</div>
+    <select id="balance-curr-select" class="curr-selector" onchange="updateBalanceUI()">
+      <option value="UAH">UAH</option>
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+    </select>
+  </div>
   <div id="balance-main" class="balance-value">0,00 ₴</div>
   <div id="balance-details" class="balance-details"></div>
 </div>
 
-<!-- Кнопки быстрого доступа (вместо списков) -->
+<!-- Кнопки быстрого доступа -->
 <div class="quick-add-container">
-  <button class="add-btn-main exp" onclick="openTxModal('expense')"><i data-lucide="minus-circle"></i> Расход</button>
-  <button class="add-btn-main inc" onclick="openTxModal('income')"><i data-lucide="plus-circle"></i> Доход</button>
+  <button class="add-btn-main exp" onclick="openTxModal('expense')"><i data-lucide="minus-circle"></i> Добавить расход</button>
+  <button class="add-btn-main inc" onclick="openTxModal('income')"><i data-lucide="plus-circle"></i> Добавить доход</button>
 </div>
 
-<!-- График -->
-<div class="chart-section">
-  <div class="chart-tabs">
-    <button class="chart-tab active" onclick="switchChart('expense')">Расходы</button>
-    <button class="chart-tab" onclick="switchChart('income')">Доходы</button>
+<!-- Графики -->
+<div class="charts-wrapper">
+  <div class="chart-section">
+    <h3 style="margin-bottom:15px; text-align:center;">Расходы</h3>
+    <div class="chart-currency-filter">
+      <div class="curr-filter-btn active" onclick="setChartCurr('expense','UAH')">UAH</div>
+      <div class="curr-filter-btn" onclick="setChartCurr('expense','USD')">USD</div>
+      <div class="curr-filter-btn" onclick="setChartCurr('expense','EUR')">EUR</div>
+    </div>
+    <div class="chart-container"><canvas id="expChart"></canvas></div>
   </div>
-  <div class="chart-currency-filter">
-    <div class="curr-filter-btn active" onclick="setChartCurr('UAH')">UAH</div>
-    <div class="curr-filter-btn" onclick="setChartCurr('USD')">USD</div>
-    <div class="curr-filter-btn" onclick="setChartCurr('EUR')">EUR</div>
+  <div class="chart-section">
+    <h3 style="margin-bottom:15px; text-align:center;">Доходы</h3>
+    <div class="chart-currency-filter">
+      <div class="curr-filter-btn active" onclick="setChartCurr('income','UAH')">UAH</div>
+      <div class="curr-filter-btn" onclick="setChartCurr('income','USD')">USD</div>
+      <div class="curr-filter-btn" onclick="setChartCurr('income','EUR')">EUR</div>
+    </div>
+    <div class="chart-container"><canvas id="incChart"></canvas></div>
   </div>
-  <div class="chart-container"><canvas id="mainChart"></canvas></div>
-  <div style="text-align:center; color:#666; font-size:12px; margin-top:10px;">Нажмите на сектор диаграммы для деталей</div>
 </div>
 
 <!-- Модалка Баланса и Курсов -->
@@ -180,8 +197,8 @@ body {
     <span class="close-modal" onclick="closeModal('tx-modal')"><i data-lucide="x"></i></span>
     <h2 id="tx-modal-title">Добавить запись</h2>
     <input type="hidden" id="tx-type">
+    <input type="hidden" id="tx-edit-id">
     
-    <!-- 1. Валюта -->
     <div class="input-group">
       <label>Валюта</label>
       <select id="tx-curr">
@@ -191,20 +208,17 @@ body {
       </select>
     </div>
     
-    <!-- 2. Категория -->
     <div class="input-group">
       <label>Категория</label>
       <select id="tx-cat" onchange="checkNewCatModal()"></select>
       <input type="text" id="tx-new-cat" placeholder="Новая категория..." style="display:none; margin-top:5px;">
     </div>
 
-    <!-- 3. Сумма / Описание -->
     <div class="input-group">
       <label>Сумма / Описание</label>
       <input type="text" id="tx-input" placeholder="Например: 500 бургер" onkeypress="handleModalEnter(event)">
     </div>
 
-    <!-- 4. Дата -->
     <div class="input-group">
       <label>Дата</label>
       <input type="date" id="tx-date">
@@ -221,8 +235,9 @@ body {
     <h2 id="detail-title">Детализация</h2>
     <div class="period-filter" style="margin:15px 0; display:flex; gap:5px;">
       <button class="filter-btn active" onclick="setDetailFilter('all')" style="padding:5px 10px; background:rgba(255,255,255,0.1); border-radius:5px; color:white; border:none; cursor:pointer;">Все</button>
-      <button class="filter-btn" onclick="setDetailFilter('month')" style="padding:5px 10px; background:rgba(255,255,255,0.05); border-radius:5px; color:#888; border:none; cursor:pointer;">Месяц</button>
+      <button class="filter-btn" onclick="setDetailFilter('today')" style="padding:5px 10px; background:rgba(255,255,255,0.05); border-radius:5px; color:#888; border:none; cursor:pointer;">Сегодня</button>
       <button class="filter-btn" onclick="setDetailFilter('week')" style="padding:5px 10px; background:rgba(255,255,255,0.05); border-radius:5px; color:#888; border:none; cursor:pointer;">Неделя</button>
+      <button class="filter-btn" onclick="setDetailFilter('month')" style="padding:5px 10px; background:rgba(255,255,255,0.05); border-radius:5px; color:#888; border:none; cursor:pointer;">Месяц</button>
     </div>
     <div id="detail-list"></div>
   </div>
@@ -233,9 +248,8 @@ let allData = JSON.parse(localStorage.getItem('finData')) || {};
 let balances = JSON.parse(localStorage.getItem('finBal')) || {USD:0, UAH:0, EUR:0};
 let rates = JSON.parse(localStorage.getItem('finRates')) || {USD:41.5, EUR:45.0, EUR_USD:1.08};
 let currentMonth = new Date().toISOString().slice(0, 7);
-let chartType = 'expense';
-let chartCurr = 'UAH';
-let pieChart = null;
+let chartCurr = {expense: 'UAH', income: 'UAH'};
+let expChart = null, incChart = null;
 let detailCategory = '';
 let detailType = '';
 
@@ -249,28 +263,44 @@ init();
 function init() {
   updateMonthUI();
   updateBalanceUI();
-  updateChart();
+  updateCharts();
   lucide.createIcons();
 }
 
 // --- БАЛАНС ---
+function formatMoney(amount, curr) {
+  const sym = curr === 'USD' ? '$' : curr === 'UAH' ? '₴' : '€';
+  // Формат: 1 234,56
+  const formatted = amount.toFixed(2).replace(/\d(?=(\d{3})+(?!\d))/g, "$& ").replace('.', ',');
+  return `${sym} ${formatted}`;
+}
+
 function updateBalanceUI() {
   const txs = allData[currentMonth] || [];
-  let totalUAH = 0;
+  const targetCurr = document.getElementById('balance-curr-select').value;
+  
+  let totalInTarget = 0;
   
   ['USD','UAH','EUR'].forEach(c => {
     const income = txs.filter(t => t.type === 'income' && t.currency === c).reduce((s,t)=>s+t.amount,0);
     const expense = txs.filter(t => t.type === 'expense' && t.currency === c).reduce((s,t)=>s+t.amount,0);
     const net = balances[c] + income - expense;
     
-    let valInUAH = net;
-    if(c === 'USD') valInUAH = net * rates.USD;
-    if(c === 'EUR') valInUAH = net * rates.EUR;
-    
-    totalUAH += valInUAH;
+    let val = net;
+    if(targetCurr === 'UAH') {
+      if(c === 'USD') val = net * rates.USD;
+      if(c === 'EUR') val = net * rates.EUR;
+    } else if (targetCurr === 'USD') {
+      if(c === 'UAH') val = net / rates.USD;
+      if(c === 'EUR') val = net * rates.EUR_USD;
+    } else if (targetCurr === 'EUR') {
+      if(c === 'UAH') val = net / rates.EUR;
+      if(c === 'USD') val = net / rates.EUR_USD;
+    }
+    totalInTarget += val;
   });
 
-  document.getElementById('balance-main').textContent = formatMoney(totalUAH, 'UAH');
+  document.getElementById('balance-main').textContent = formatMoney(totalInTarget, targetCurr);
   
   const detailsDiv = document.getElementById('balance-details');
   let html = '';
@@ -278,31 +308,71 @@ function updateBalanceUI() {
     const income = txs.filter(t => t.type === 'income' && t.currency === c).reduce((s,t)=>s+t.amount,0);
     const expense = txs.filter(t => t.type === 'expense' && t.currency === c).reduce((s,t)=>s+t.amount,0);
     const total = balances[c] + income - expense;
-    const sym = c === 'USD' ? '$' : c === 'UAH' ? '₴' : '€';
-    html += `<div>${sym} ${formatMoney(total, c)}</div>`;
+    html += `<div>${c}: ${formatMoney(total, c)}</div>`;
   });
   detailsDiv.innerHTML = html;
 }
 
-function toggleBalanceDetails() {
-  document.getElementById('balance-details').classList.toggle('active');
+// --- МЕСЯЦЫ ---
+function updateMonthUI() {
+  const months = Object.keys(allData).sort();
+  const textEl = document.getElementById('month-text');
+  const selectEl = document.getElementById('month-select');
+  const [y, m] = currentMonth.split('-');
+  textEl.textContent = `${monthNames[parseInt(m)-1]} ${y}`;
+  
+  if(months.length > 1) {
+    textEl.style.display = 'none';
+    selectEl.style.display = 'block';
+    selectEl.innerHTML = '';
+    months.forEach(mo => {
+      const opt = document.createElement('option');
+      opt.value = mo;
+      const [yy, mm] = mo.split('-');
+      opt.textContent = `${monthNames[parseInt(mm)-1]} ${yy}`;
+      if(mo === currentMonth) opt.selected = true;
+      selectEl.appendChild(opt);
+    });
+  } else {
+    textEl.style.display = 'block';
+    selectEl.style.display = 'none';
+  }
+}
+
+function changeMonth() {
+  currentMonth = document.getElementById('month-select').value;
+  if(!allData[currentMonth]) allData[currentMonth] = [];
+  init();
 }
 
 // --- МОДАЛКИ И ВВОД ---
-function openTxModal(type) {
+function openTxModal(type, editId = null) {
   document.getElementById('tx-type').value = type;
-  document.getElementById('tx-modal-title').textContent = type === 'expense' ? 'Добавить расход' : 'Добавить доход';
-  document.getElementById('tx-input').value = '';
-  document.getElementById('tx-new-cat').value = '';
-  document.getElementById('tx-new-cat').style.display = 'none';
-  document.getElementById('tx-date').valueAsDate = new Date();
+  document.getElementById('tx-edit-id').value = editId || '';
+  document.getElementById('tx-modal-title').textContent = editId ? 'Редактировать запись' : (type === 'expense' ? 'Добавить расход' : 'Добавить доход');
   
   const catSelect = document.getElementById('tx-cat');
   const cats = type === 'expense' ? expCats : incCats;
   catSelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('') + '<option value="__NEW__">➕ Создать свою...</option>';
   
+  if(editId) {
+    // Режим редактирования
+    const tx = (allData[currentMonth] || []).find(t => t.id == editId);
+    if(tx) {
+      document.getElementById('tx-curr').value = tx.currency;
+      document.getElementById('tx-cat').value = tx.category;
+      document.getElementById('tx-input').value = `${tx.amount} ${tx.description}`;
+      document.getElementById('tx-date').value = tx.date.split('T')[0];
+    }
+  } else {
+    // Режим добавления
+    document.getElementById('tx-input').value = '';
+    document.getElementById('tx-new-cat').value = '';
+    document.getElementById('tx-new-cat').style.display = 'none';
+    document.getElementById('tx-date').valueAsDate = new Date();
+  }
+  
   document.getElementById('tx-modal').classList.add('active');
-  // Фокус на первое поле (Валюта уже выбрана, можно на Сумму)
   setTimeout(() => document.getElementById('tx-input').focus(), 100);
 }
 
@@ -330,6 +400,7 @@ function saveTransaction() {
   const catSelect = document.getElementById('tx-cat');
   const newCatInput = document.getElementById('tx-new-cat');
   const dateVal = document.getElementById('tx-date').value;
+  const editId = document.getElementById('tx-edit-id').value;
 
   const { amount, desc } = parseInput(inputVal);
   if(amount <= 0) return alert('Введите сумму!');
@@ -340,8 +411,12 @@ function saveTransaction() {
     if(!category) return alert('Введите название категории!');
   }
 
-  if (type === 'expense') {
-    const txs = allData[currentMonth] || [];
+  // Определяем месяц по дате
+  const txMonth = dateVal ? dateVal.slice(0, 7) : currentMonth;
+  if(!allData[txMonth]) allData[txMonth] = [];
+
+  if (type === 'expense' && !editId) {
+    const txs = allData[txMonth] || [];
     const income = txs.filter(t => t.type === 'income' && t.currency === curr).reduce((s,t)=>s+t.amount,0);
     const expense = txs.filter(t => t.type === 'expense' && t.currency === curr).reduce((s,t)=>s+t.amount,0);
     if ((balances[curr] + income - expense) < amount) {
@@ -349,41 +424,70 @@ function saveTransaction() {
     }
   }
 
-  const tx = { 
-    id: Date.now(), 
+  const txObj = { 
+    id: editId ? parseInt(editId) : Date.now(), 
     type, amount, currency: curr, category, description: desc, 
     date: dateVal ? new Date(dateVal).toISOString() : new Date().toISOString() 
   };
   
-  allData[currentMonth].push(tx);
+  if(editId) {
+    // Обновляем существующую (ищем в том месяце, где она была)
+    Object.keys(allData).forEach(m => {
+      const idx = allData[m].findIndex(t => t.id == editId);
+      if(idx !== -1) {
+        allData[m][idx] = txObj;
+        // Если месяц изменился, переносим
+        if(m !== txMonth) {
+          allData[m].splice(idx, 1);
+          allData[txMonth].push(txObj);
+        }
+      }
+    });
+  } else {
+    allData[txMonth].push(txObj);
+  }
+
   localStorage.setItem('finData', JSON.stringify(allData));
+  
+  // Если мы добавили запись в другой месяц, переключаемся на него
+  if(txMonth !== currentMonth) {
+    currentMonth = txMonth;
+  }
+  
   closeModal('tx-modal');
   init();
 }
 
-// --- ГРАФИК ---
-function setChartCurr(c) {
-  chartCurr = c;
-  document.querySelectorAll('.curr-filter-btn').forEach(b => b.classList.remove('active'));
+// --- ГРАФИКИ ---
+function setChartCurr(type, c) {
+  chartCurr[type] = c;
+  // Обновляем активную кнопку
+  const container = event.target.parentElement;
+  Array.from(container.children).forEach(b => b.classList.remove('active'));
   event.target.classList.add('active');
-  updateChart();
+  updateCharts();
 }
 
-function updateChart() {
-  const ctx = document.getElementById('mainChart').getContext('2d');
-  const txs = (allData[currentMonth] || []).filter(t => t.type === chartType && t.currency === chartCurr);
+function updateCharts() {
+  renderChart('expense', 'expChart', expChart, (c) => expChart = c);
+  renderChart('income', 'incChart', incChart, (c) => incChart = c);
+}
+
+function renderChart(type, canvasId, chartInstance, setChart) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const txs = (allData[currentMonth] || []).filter(t => t.type === type && t.currency === chartCurr[type]);
   const byCat = {};
   const total = txs.reduce((s,t) => s+t.amount, 0);
   txs.forEach(t => byCat[t.category] = (byCat[t.category] || 0) + t.amount);
   
-  if(pieChart) pieChart.destroy();
+  if(chartInstance) chartInstance.destroy();
   
   const labels = Object.keys(byCat).map(k => {
     const percent = total > 0 ? ((byCat[k]/total)*100).toFixed(0) : 0;
     return `${k} (${percent}%)`;
   });
 
-  pieChart = new Chart(ctx, {
+  const newChart = new Chart(ctx, {
     type: 'doughnut',
     data: { 
       labels: labels, 
@@ -395,26 +499,20 @@ function updateChart() {
         if(elements.length > 0) {
           const index = elements[0].index;
           const catName = Object.keys(byCat)[index];
-          openChartDetail(catName);
+          openChartDetail(catName, type);
         }
       },
       plugins: { legend: { position:'bottom', labels:{color:'#fff'} } } 
     }
   });
-}
-
-function switchChart(type) {
-  chartType = type;
-  document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  updateChart();
+  setChart(newChart);
 }
 
 // --- ДЕТАЛИЗАЦИЯ ---
-function openChartDetail(cat) {
+function openChartDetail(cat, type) {
   detailCategory = cat;
-  detailType = chartType;
-  document.getElementById('detail-title').textContent = `${cat} (${chartType === 'expense' ? 'Расходы' : 'Доходы'})`;
+  detailType = type;
+  document.getElementById('detail-title').textContent = `${cat} (${type === 'expense' ? 'Расходы' : 'Доходы'})`;
   setDetailFilter('all');
   document.getElementById('chart-detail-modal').classList.add('active');
 }
@@ -427,6 +525,7 @@ function setDetailFilter(period) {
   const txs = (allData[currentMonth] || []).filter(t => {
     if(t.category !== detailCategory || t.type !== detailType) return false;
     const d = new Date(t.date);
+    if(period === 'today') return d.toDateString() === now.toDateString();
     if(period === 'month') return d.getMonth() === now.getMonth();
     if(period === 'week') { const w = new Date(now); w.setDate(w.getDate()-7); return d >= w; }
     return true;
@@ -436,7 +535,6 @@ function setDetailFilter(period) {
   if(txs.length === 0) { list.innerHTML = '<div style="color:#666">Нет записей</div>'; return; }
   
   list.innerHTML = txs.map(t => {
-    const sym = t.currency === 'USD' ? '$' : t.currency === 'UAH' ? '₴' : '€';
     return `
       <div class="tx-mini" style="background:rgba(255,255,255,0.03); padding:10px; margin-bottom:5px; border-radius:8px;">
         <div style="display:flex; justify-content:space-between;">
@@ -445,6 +543,7 @@ function setDetailFilter(period) {
         </div>
         <div style="font-size:11px; color:#888; margin-top:4px;">${new Date(t.date).toLocaleDateString()} • ${t.category}</div>
         <div style="display:flex; gap:10px; margin-top:5px;">
+           <i data-lucide="pencil" style="width:14px; color:#667eea; cursor:pointer;" onclick="openTxModal('${t.type}', ${t.id})"></i>
            <i data-lucide="trash-2" style="width:14px; color:#FF6B6B; cursor:pointer;" onclick="deleteTx(${t.id})"></i>
         </div>
       </div>`;
@@ -453,41 +552,6 @@ function setDetailFilter(period) {
 }
 
 // --- УТИЛИТЫ ---
-function formatMoney(amount, curr) {
-  const sym = curr === 'USD' ? '$' : curr === 'UAH' ? '₴' : '€';
-  return `${amount.toFixed(2).replace('.', ',')} ${sym}`;
-}
-
-function updateMonthUI() {
-  const months = Object.keys(allData).sort();
-  const textEl = document.getElementById('month-text');
-  const selectEl = document.getElementById('month-select');
-  const [y, m] = currentMonth.split('-');
-  textEl.textContent = `${monthNames[parseInt(m)-1]} ${y}`;
-  if(months.length > 1) {
-    textEl.style.display = 'none';
-    selectEl.style.display = 'block';
-    selectEl.innerHTML = '';
-    months.forEach(mo => {
-      const opt = document.createElement('option');
-      opt.value = mo;
-      const [yy, mm] = mo.split('-');
-      opt.textContent = `${monthNames[parseInt(mm)-1]} ${yy}`;
-      if(mo === currentMonth) opt.selected = true;
-      selectEl.appendChild(opt);
-    });
-  } else {
-    textEl.style.display = 'block';
-    selectEl.style.display = 'none';
-  }
-}
-
-function changeMonth() {
-  currentMonth = document.getElementById('month-select').value;
-  if(!allData[currentMonth]) allData[currentMonth] = [];
-  init();
-}
-
 function toggleMenu() { document.getElementById('main-menu').classList.toggle('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -517,7 +581,9 @@ function saveBalances() {
 
 function deleteTx(id) {
   if(!confirm('Удалить запись?')) return;
-  allData[currentMonth] = allData[currentMonth].filter(t => t.id !== id);
+  Object.keys(allData).forEach(m => {
+    allData[m] = allData[m].filter(t => t.id !== id);
+  });
   localStorage.setItem('finData', JSON.stringify(allData));
   init();
   if(document.getElementById('chart-detail-modal').classList.contains('active')) {
@@ -540,9 +606,9 @@ function exportToPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   
-  // Используем стандартный шрифт, но транслитерируем или используем английский для надежности
-  // Для кириллицы в jsPDF нужен base64 шрифт, что сильно увеличит код. 
-  // Пока используем английский заголовок и корректный формат чисел.
+  // Подключаем шрифт Roboto для кириллицы
+  doc.addFileToVFS('Roboto-Regular.ttf', 'AAEAAAARAQA...'); // Здесь должен быть base64 шрифта, но для простоты используем стандартный с транслитом или английским
+  // Для надежности в этом коде используем английский язык отчета, но правильный формат чисел
   
   doc.setFontSize(18);
   doc.text("Finance Report", 14, 22);
@@ -556,7 +622,7 @@ function exportToPDF() {
       t.type === 'expense' ? 'Expense' : 'Income', 
       t.category, 
       t.description, 
-      formatMoney(t.amount, t.currency) // Формат: 100,00 $
+      formatMoney(t.amount, t.currency).replace('₴', 'UAH').replace('$', 'USD').replace('€', 'EUR') // Приводим к кодам валют
     ]),
     startY: 40,
     theme: 'grid'
