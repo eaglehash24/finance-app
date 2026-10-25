@@ -34,7 +34,7 @@ body { font-family: 'Inter', sans-serif; background: #0F0F14; color: #fff; max-w
 .month-select { padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; display: none; }
 .menu-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px; color: white; cursor: pointer; }
 
-/* Баланс (Неон) */
+/* Неоновый Баланс */
 .balance-card {
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(20px);
@@ -43,20 +43,20 @@ body { font-family: 'Inter', sans-serif; background: #0F0F14; color: #fff; max-w
   padding: 30px;
   margin-bottom: 20px;
   text-align: center;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
 }
 .balance-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 .balance-value {
-  font-size: 42px;
+  font-size: 48px;
   font-weight: 800;
   background: linear-gradient(90deg, #00FF88, #00D4FF);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  text-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
 }
-.balance-placeholder { color: #666; font-style: italic; font-size: 14px; padding: 20px 0; }
-.balance-details { display: flex; justify-content: space-around; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
-.detail-item { text-align: center; }
-.detail-val { font-weight: 700; font-size: 14px; }
+.balance-placeholder { color: #666; font-style: italic; font-size: 14px; padding: 10px 0; }
+.balance-details { display: flex; justify-content: center; gap: 20px; font-size: 13px; color: #aaa; }
 
 /* Фильтры и Списки */
 .period-filter { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; }
@@ -236,34 +236,43 @@ function updateBalanceUI() {
   const container = document.getElementById('balance-main');
   const txs = allData[currentMonth] || [];
   
-  let totalAll = 0;
-  let hasMoney = false;
+  // Проверяем, есть ли вообще деньги или записи
+  let hasActivity = false;
+  ['USD','UAH','EUR'].forEach(c => {
+    if(balances[c] !== 0) hasActivity = true;
+    if(txs.some(t => t.currency === c)) hasActivity = true;
+  });
+
+  if (!hasActivity) {
+    container.innerHTML = `<div class="balance-placeholder">Введите начальный баланс или создайте новый доход</div>`;
+    return;
+  }
+
+  // Если активность есть, показываем неоновую цифру (суммируем для красоты или показываем основную)
+  // Для простоты покажем сумму по основной валюте или просто список активных
+  let html = '';
+  let totalMain = 0; // Например, в гривнах
   
   ['USD','UAH','EUR'].forEach(c => {
     const income = txs.filter(t => t.type === 'income' && t.currency === c).reduce((s,t)=>s+t.amount,0);
     const expense = txs.filter(t => t.type === 'expense' && t.currency === c).reduce((s,t)=>s+t.amount,0);
     const total = balances[c] + income - expense;
-    if(total !== 0 || balances[c] !== 0) hasMoney = true;
-    // Для простоты отображаем общую сумму в первой валюте или просто заглушку
-  });
-
-  // Упрощенный вывод общего баланса (можно доработать под мульти-валютный итог)
-  const mainBal = balances.UAH + (txs.filter(t=>t.type==='income').reduce((s,t)=>s+(t.currency==='UAH'?t.amount:0),0)) - (txs.filter(t=>t.type==='expense').reduce((s,t)=>s+(t.currency==='UAH'?t.amount:0),0));
-  
-  if (!hasMoney && txs.length === 0) {
-    container.innerHTML = `<div class="balance-placeholder">Введите начальный баланс или создайте новый доход</div>`;
-  } else {
-    // Показываем балансы по валютам
-    let html = '';
-    ['USD','UAH','EUR'].forEach(c => {
-        const income = txs.filter(t => t.type === 'income' && t.currency === c).reduce((s,t)=>s+t.amount,0);
-        const expense = txs.filter(t => t.type === 'expense' && t.currency === c).reduce((s,t)=>s+t.amount,0);
-        const total = balances[c] + income - expense;
+    
+    // Показываем только если не 0
+    if(total !== 0 || balances[c] !== 0) {
         const sym = c === 'USD' ? '$' : c === 'UAH' ? '₴' : '€';
-        html += `<div style="margin-bottom:5px;"><span style="color:#888">${sym} ${c}:</span> <span style="font-weight:700">${sym}${total.toFixed(2)}</span></div>`;
-    });
-    container.innerHTML = html;
-  }
+        // Делаем главную цифру самой большой
+        if(c === 'UAH') {
+             // Можно сделать акцент на гривне, но пока просто список
+        }
+        html += `<div style="margin-bottom:5px; font-size:18px;"><span style="color:#888">${sym} ${c}:</span> <span style="font-weight:700; color:#fff">${sym}${total.toFixed(2)}</span></div>`;
+    }
+  });
+  
+  // Если html пуст (все по нулям, но записи были), пишем 0
+  if(!html) html = '<div style="font-size:18px; color:#fff">0.00</div>';
+  
+  container.innerHTML = html;
 }
 
 function updateMonthUI() {
@@ -306,12 +315,10 @@ function populateCategories() {
   const expSelect = document.getElementById('exp-cat');
   const incSelect = document.getElementById('inc-cat');
   
-  // Расходы
   const allExp = new Set([...expCats]);
   Object.values(allData).forEach(m => m.forEach(t => { if(t.type==='expense' && t.category) allExp.add(t.category); }));
   expSelect.innerHTML = Array.from(allExp).map(c => `<option value="${c}">${c}</option>`).join('') + '<option value="__NEW__">➕ Создать свою...</option>';
 
-  // Доходы
   const allInc = new Set([...incCats]);
   Object.values(allData).forEach(m => m.forEach(t => { if(t.type==='income' && t.category) allInc.add(t.category); }));
   incSelect.innerHTML = Array.from(allInc).map(c => `<option value="${c}">${c}</option>`).join('') + '<option value="__NEW__">➕ Создать свою...</option>';
@@ -450,7 +457,6 @@ function saveBalances() {
   init();
 }
 
-// Редактирование
 function openEdit(id) {
   const tx = (allData[currentMonth] || []).find(t => t.id === id);
   if(!tx) return;
@@ -460,7 +466,6 @@ function openEdit(id) {
   
   const catSelect = document.getElementById('edit-cat');
   const cats = tx.type === 'expense' ? expCats : incCats;
-  // Добавляем текущую категорию, если её нет в стандартных
   const allCats = new Set([...cats]);
   Object.values(allData).forEach(m => m.forEach(t => { if(t.type===tx.type && t.category) allCats.add(t.category); }));
   catSelect.innerHTML = Array.from(allCats).map(c => `<option value="${c}" ${c===tx.category?'selected':''}>${c}</option>`).join('');
@@ -488,8 +493,12 @@ function deleteTx(id) {
 }
 
 function resetMonth() {
-  if(confirm('Обнулить месяц?')) {
+  if(confirm('Обнулить все записи и баланс за этот месяц?')) {
     allData[currentMonth] = [];
+    // Сбрасываем баланс только для текущего месяца? 
+    // В текущей логике баланс глобальный. Если нужно сбросить глобально:
+    balances = {USD:0, UAH:0, EUR:0};
+    localStorage.setItem('finBal', JSON.stringify(balances));
     localStorage.setItem('finData', JSON.stringify(allData));
     init();
     toggleMenu();
