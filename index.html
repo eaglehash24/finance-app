@@ -9,34 +9,21 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Финансы">
 
-<!-- Open Graph -->
-<meta property="og:title" content="💰 Мои финансы">
-<meta property="og:description" content="Умный учёт доходов и расходов">
-<meta property="og:image" content="https://eaglehash24.github.io/finance-app/og-image.png?v=3">
-<meta property="og:url" content="https://eaglehash24.github.io/finance-app/">
-<meta property="og:type" content="website">
-
 <link rel="icon" type="image/png" href="./icon-512.png">
 <link rel="apple-touch-icon" href="./icon-512.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { 
-  font-family: 'Inter', sans-serif; 
-  background: #0F0F14; 
-  color: #fff; 
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto; 
-  padding: 20px; 
-  min-height: 100vh; 
+  font-family: 'Inter', sans-serif; background: #0F0F14; color: #fff; 
+  width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px; min-height: 100vh; 
 }
 
 /* Шапка */
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; z-index: 50; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .month-display { font-size: 20px; font-weight: 700; }
 .month-select { 
   padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
@@ -59,7 +46,7 @@ body {
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat; background-position: right 5px center; background-size: 12px; padding-right: 20px;
 }
-.balance-value { font-size: 32px; font-weight: 700; color: #00FF88; margin-bottom: 15px; text-shadow: 0 0 15px rgba(0, 255, 136, 0.2); }
+.balance-value { font-size: 32px; font-weight: 700; color: #00FF88; margin-bottom: 15px; }
 .balance-details { display: flex; justify-content: center; gap: 20px; font-size: 14px; color: #aaa; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
 
 /* Кнопки добавления */
@@ -71,7 +58,7 @@ body {
 .add-btn-main.exp { background: rgba(255, 107, 107, 0.1); color: #FF6B6B; border: 1px solid #FF6B6B; }
 .add-btn-main.inc { background: rgba(0, 255, 136, 0.1); color: #00FF88; border: 1px solid #00FF88; }
 
-/* Графики и Списки */
+/* Графики */
 .charts-wrapper { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 15px; width: 100%; }
 .chart-section { 
   background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); 
@@ -85,23 +72,15 @@ body {
 .curr-filter-btn { padding: 5px 10px; background: rgba(255,255,255,0.05); border-radius: 5px; cursor: pointer; font-size: 12px; color: #888; }
 .curr-filter-btn.active { background: #667eea; color: white; }
 
-/* Меню категорий под заголовком */
+/* Меню категорий */
 .category-menu {
-  display: none;
-  position: absolute;
-  top: 60px;
-  left: 20px;
-  background: #1A1A24;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 10px;
-  z-index: 100;
-  width: 200px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: none; position: absolute; top: 60px; left: 20px; background: #1A1A24;
+  border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; z-index: 100;
+  width: 200px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 .category-menu.active { display: block; }
 .cat-option { padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; font-size: 14px; }
 .cat-option:hover { background: rgba(255,255,255,0.05); }
-.cat-option:last-child { border-bottom: none; }
 
 /* Список транзакций */
 .tx-list-container { margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
@@ -113,13 +92,10 @@ body {
 .tx-info b { display: block; margin-bottom: 2px; }
 .tx-info span { font-size: 11px; color: #888; }
 
-/* Правая часть карточки: Сумма + Кнопки */
+/* Правая часть: Сумма + Кнопки */
 .tx-right-side {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Разносит сумму и кнопки по краям */
-  min-width: 120px; /* Минимальная ширина для стабильности */
-  gap: 15px;
+  display: flex; align-items: center; justify-content: space-between; 
+  min-width: 130px; gap: 15px;
 }
 .tx-actions { display: flex; gap: 15px; align-items: center; }
 .action-icon { width: 16px; height: 16px; cursor: pointer; }
@@ -190,7 +166,7 @@ body {
 <!-- Графики и Списки -->
 <div class="charts-wrapper">
   <!-- РАСХОДЫ -->
-  <div class="chart-section">
+  <div class="chart-section" id="section-expense">
     <div class="chart-header" onclick="toggleCategoryMenu('expense')">
       <h3>Расходы <i data-lucide="chevron-down" style="width:16px;"></i></h3>
       <div class="chart-currency-filter">
@@ -199,11 +175,8 @@ body {
         <div class="curr-filter-btn" onclick="setChartCurr('expense','EUR'); event.stopPropagation();">EUR</div>
       </div>
     </div>
-    
     <div id="exp-cat-menu" class="category-menu"></div>
-
     <div class="chart-container"><canvas id="expChart"></canvas></div>
-    
     <div id="exp-list-view" style="display:none;">
       <div class="period-filters">
         <button class="period-btn active" onclick="setPeriodFilter('expense','all')">Все</button>
@@ -216,7 +189,7 @@ body {
   </div>
 
   <!-- ДОХОДЫ -->
-  <div class="chart-section">
+  <div class="chart-section" id="section-income">
     <div class="chart-header" onclick="toggleCategoryMenu('income')">
       <h3>Доходы <i data-lucide="chevron-down" style="width:16px;"></i></h3>
       <div class="chart-currency-filter">
@@ -225,11 +198,8 @@ body {
         <div class="curr-filter-btn" onclick="setChartCurr('income','EUR'); event.stopPropagation();">EUR</div>
       </div>
     </div>
-
     <div id="inc-cat-menu" class="category-menu"></div>
-
     <div class="chart-container"><canvas id="incChart"></canvas></div>
-
     <div id="inc-list-view" style="display:none;">
       <div class="period-filters">
         <button class="period-btn active" onclick="setPeriodFilter('income','all')">Все</button>
@@ -274,23 +244,19 @@ body {
         <option value="EUR">€ EUR</option>
       </select>
     </div>
-    
     <div class="input-group">
       <label>Категория</label>
       <select id="tx-cat" onchange="checkNewCatModal()"></select>
       <input type="text" id="tx-new-cat" placeholder="Новая категория..." style="display:none; margin-top:5px;">
     </div>
-
     <div class="input-group">
       <label>Сумма / Описание</label>
       <input type="text" id="tx-input" placeholder="Например: 500 бургер" onkeypress="handleModalEnter(event)">
     </div>
-
     <div class="input-group">
       <label>Дата</label>
       <input type="date" id="tx-date">
     </div>
-
     <button class="save-btn" onclick="saveTransaction()">Сохранить</button>
   </div>
 </div>
@@ -319,7 +285,6 @@ function init() {
   lucide.createIcons();
 }
 
-// --- БАЛАНС ---
 function formatMoney(amount, curr) {
   const sym = curr === 'USD' ? '$' : curr === 'UAH' ? '₴' : '€';
   const formatted = amount.toFixed(2).replace(/\d(?=(\d{3})+(?!\d))/g, "$& ").replace('.', ',');
@@ -361,7 +326,6 @@ function updateBalanceUI() {
   detailsDiv.innerHTML = html;
 }
 
-// --- МЕСЯЦЫ ---
 function updateMonthUI() {
   const months = Object.keys(allData).sort();
   const textEl = document.getElementById('month-text');
@@ -392,7 +356,6 @@ function changeMonth() {
   init();
 }
 
-// --- МОДАЛКИ И ВВОД ---
 function openTxModal(type, editId = null) {
   document.getElementById('tx-type').value = type;
   document.getElementById('tx-edit-id').value = editId || '';
@@ -485,7 +448,7 @@ function saveTransaction() {
   if(txMonth !== currentMonth) currentMonth = txMonth;
   closeModal('tx-modal');
   
-  // Принудительно обновляем списки, если мы находимся в режиме просмотра категории
+  // МГНОВЕННОЕ ОБНОВЛЕНИЕ СПИСКОВ
   if(selectedCat.expense) renderGroupedList('expense', selectedCat.expense);
   if(selectedCat.income) renderGroupedList('income', selectedCat.income);
   
@@ -496,17 +459,14 @@ function saveTransaction() {
 function setChartCurr(type, c) {
   chartCurr[type] = c;
   
-  // Жесткая привязка к ID конкретного графика, чтобы не задеть соседний блок
-  const sectionId = type === 'expense' ? 'expChart' : 'incChart';
-  const section = document.getElementById(sectionId).closest('.chart-section');
+  // ИЗОЛИРОВАННОЕ ОБНОВЛЕНИЕ КНОПОК
+  const sectionId = type === 'expense' ? 'section-expense' : 'section-income';
+  const section = document.getElementById(sectionId);
   const buttons = section.querySelectorAll('.curr-filter-btn');
   
   buttons.forEach(btn => {
-    if(btn.textContent.trim() === c) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
+    if(btn.textContent.trim() === c) btn.classList.add('active');
+    else btn.classList.remove('active');
   });
   
   updateCharts();
@@ -515,9 +475,7 @@ function setChartCurr(type, c) {
 function toggleCategoryMenu(type) {
   const menu = document.getElementById(type === 'expense' ? 'exp-cat-menu' : 'inc-cat-menu');
   const isActive = menu.classList.contains('active');
-  
   document.querySelectorAll('.category-menu').forEach(m => m.classList.remove('active'));
-  
   if(!isActive) {
     updateCategoryMenu(type);
     menu.classList.add('active');
@@ -528,7 +486,6 @@ function updateCategoryMenu(type) {
   const txs = (allData[currentMonth] || []).filter(t => t.type === type && t.currency === chartCurr[type]);
   const cats = [...new Set(txs.map(t => t.category))];
   const menu = document.getElementById(type === 'expense' ? 'exp-cat-menu' : 'inc-cat-menu');
-  
   let html = `<div class="cat-option" onclick="selectCategory('${type}', '')">📊 Назад к графику</div>`;
   cats.forEach(c => {
     html += `<div class="cat-option" onclick="selectCategory('${type}', '${c}')">${c}</div>`;
@@ -539,7 +496,6 @@ function updateCategoryMenu(type) {
 function selectCategory(type, cat) {
   selectedCat[type] = cat;
   document.getElementById(type === 'expense' ? 'exp-cat-menu' : 'inc-cat-menu').classList.remove('active');
-  
   const listView = document.getElementById(type === 'expense' ? 'exp-list-view' : 'inc-list-view');
   const chartContainer = document.getElementById(type === 'expense' ? 'expChart' : 'incChart').parentElement;
   
@@ -565,20 +521,15 @@ function setPeriodFilter(type, period) {
 function renderGroupedList(type, category) {
   const container = document.getElementById(type === 'expense' ? 'exp-list' : 'inc-list');
   const now = new Date();
-  
   let txs = (allData[currentMonth] || []).filter(t => t.type === type && t.category === category && t.currency === chartCurr[type]);
   
-  if(periodFilter[type] === 'today') {
-    txs = txs.filter(t => new Date(t.date).toDateString() === now.toDateString());
-  } else if(periodFilter[type] === 'week') {
+  if(periodFilter[type] === 'today') txs = txs.filter(t => new Date(t.date).toDateString() === now.toDateString());
+  else if(periodFilter[type] === 'week') {
     const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate()-7);
     txs = txs.filter(t => new Date(t.date) >= weekAgo);
-  } else if(periodFilter[type] === 'month') {
-    txs = txs.filter(t => new Date(t.date).getMonth() === now.getMonth());
-  }
+  } else if(periodFilter[type] === 'month') txs = txs.filter(t => new Date(t.date).getMonth() === now.getMonth());
 
   txs.sort((a,b) => new Date(b.date) - new Date(a.date));
-
   const grouped = {};
   txs.forEach(t => {
     const dateKey = new Date(t.date).toLocaleDateString('ru-RU');
@@ -587,7 +538,7 @@ function renderGroupedList(type, category) {
   });
 
   if(Object.keys(grouped).length === 0) {
-    container.innerHTML = '<div style="color:#666; text-align:center; padding:20px;">Нет записей за этот период</div>';
+    container.innerHTML = '<div style="color:#666; text-align:center; padding:20px;">Нет записей</div>';
     return;
   }
 
@@ -626,26 +577,16 @@ function renderChart(type, canvasId, chartInstance, setChart) {
   const byCat = {};
   const total = txs.reduce((s,t) => s+t.amount, 0);
   txs.forEach(t => byCat[t.category] = (byCat[t.category] || 0) + t.amount);
-  
   if(chartInstance) chartInstance.destroy();
-  
-  const labels = Object.keys(byCat).map(k => {
-    const percent = total > 0 ? ((byCat[k]/total)*100).toFixed(0) : 0;
-    return `${k} (${percent}%)`;
-  });
-
+  const labels = Object.keys(byCat).map(k => `${k} (${total > 0 ? ((byCat[k]/total)*100).toFixed(0) : 0}%)`);
   const newChart = new Chart(ctx, {
     type: 'doughnut',
-    data: { 
-      labels: labels, 
-      datasets: [{ data: Object.values(byCat), backgroundColor: ['#667eea','#764ba2','#00FF88','#FF6B6B','#FFC107','#00BCD4'], borderWidth: 0 }] 
-    },
+    data: { labels: labels, datasets: [{ data: Object.values(byCat), backgroundColor: ['#667eea','#764ba2','#00FF88','#FF6B6B','#FFC107','#00BCD4'], borderWidth: 0 }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position:'bottom', labels:{color:'#fff'} } } }
   });
   setChart(newChart);
 }
 
-// --- УТИЛИТЫ ---
 function toggleMenu() { document.getElementById('main-menu').classList.toggle('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -694,21 +635,10 @@ function resetMonth() {
 }
 
 function exportToCSV() {
-  let csvContent = "\uFEFF"; // BOM для корректной кириллицы в Excel/iPhone
-  csvContent += "Дата;Тип;Категория;Описание;Сумма;Валюта\n";
-  
+  let csvContent = "\uFEFFДата;Тип;Категория;Описание;Сумма;Валюта\n";
   (allData[currentMonth]||[]).forEach(t => {
-    const row = [
-      new Date(t.date).toLocaleDateString(),
-      t.type === 'expense' ? 'Расход' : 'Доход',
-      t.category,
-      t.description,
-      t.amount.toFixed(2).replace('.', ','),
-      t.currency
-    ].join(";");
-    csvContent += row + "\n";
+    csvContent += `${new Date(t.date).toLocaleDateString()};${t.type === 'expense' ? 'Расход' : 'Доход'};${t.category};${t.description};${t.amount.toFixed(2).replace('.', ',')};${t.currency}\n`;
   });
-  
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
