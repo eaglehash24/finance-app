@@ -112,7 +112,7 @@ body {
 }
 .tx-info b { display: block; margin-bottom: 2px; }
 .tx-info span { font-size: 11px; color: #888; }
-.tx-actions { display: flex; gap: 15px; /* Увеличили отступ между кнопками */ align-items: center; }
+.tx-actions { display: flex; gap: 25px; /* Увеличили отступ между кнопками */ align-items: center; }
 .action-icon { width: 16px; height: 16px; cursor: pointer; }
 
 /* Фильтры периода */
@@ -481,12 +481,18 @@ function saveTransaction() {
 // --- ГРАФИКИ И СПИСКИ ---
 function setChartCurr(type, c) {
   chartCurr[type] = c;
-  // Обновляем активную кнопку только в нужном блоке
+  
+  // Находим блок, в котором была нажата кнопка
   const section = document.getElementById(type === 'expense' ? 'expChart' : 'incChart').closest('.chart-section');
   const buttons = section.querySelectorAll('.curr-filter-btn');
-  buttons.forEach(b => {
-    if(b.textContent.trim() === c) b.classList.add('active');
-    else b.classList.remove('active');
+  
+  // Обновляем активный класс только внутри этого блока
+  buttons.forEach(btn => {
+    if(btn.textContent.trim() === c) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
   });
   
   updateCharts();
