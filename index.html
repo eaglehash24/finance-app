@@ -89,7 +89,7 @@ body {
 .category-menu {
   display: none;
   position: absolute;
-  top: 60px; /* Под заголовком */
+  top: 60px;
   left: 20px;
   background: #1A1A24;
   border: 1px solid rgba(255,255,255,0.2);
@@ -112,7 +112,16 @@ body {
 }
 .tx-info b { display: block; margin-bottom: 2px; }
 .tx-info span { font-size: 11px; color: #888; }
-.tx-actions { display: flex; gap: 25px; /* Увеличили отступ между кнопками */ align-items: center; }
+
+/* Правая часть карточки: Сумма + Кнопки */
+.tx-right-side {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Разносит сумму и кнопки по краям */
+  min-width: 120px; /* Минимальная ширина для стабильности */
+  gap: 15px;
+}
+.tx-actions { display: flex; gap: 15px; align-items: center; }
 .action-icon { width: 16px; height: 16px; cursor: pointer; }
 
 /* Фильтры периода */
@@ -475,6 +484,11 @@ function saveTransaction() {
   localStorage.setItem('finData', JSON.stringify(allData));
   if(txMonth !== currentMonth) currentMonth = txMonth;
   closeModal('tx-modal');
+  
+  // Принудительно обновляем списки, если мы находимся в режиме просмотра категории
+  if(selectedCat.expense) renderGroupedList('expense', selectedCat.expense);
+  if(selectedCat.income) renderGroupedList('income', selectedCat.income);
+  
   init();
 }
 
@@ -482,11 +496,11 @@ function saveTransaction() {
 function setChartCurr(type, c) {
   chartCurr[type] = c;
   
-  // Находим блок, в котором была нажата кнопка
-  const section = document.getElementById(type === 'expense' ? 'expChart' : 'incChart').closest('.chart-section');
+  // Жесткая привязка к ID конкретного графика, чтобы не задеть соседний блок
+  const sectionId = type === 'expense' ? 'expChart' : 'incChart';
+  const section = document.getElementById(sectionId).closest('.chart-section');
   const buttons = section.querySelectorAll('.curr-filter-btn');
   
-  // Обновляем активный класс только внутри этого блока
   buttons.forEach(btn => {
     if(btn.textContent.trim() === c) {
       btn.classList.add('active');
@@ -587,7 +601,7 @@ function renderGroupedList(type, category) {
             <b>${t.description}</b>
             <span>${t.category}</span>
           </div>
-          <div style="text-align:right;">
+          <div class="tx-right-side">
             <div style="font-weight:700; color:${type==='expense'?'#FF6B6B':'#00FF88'}">${formatMoney(t.amount, t.currency)}</div>
             <div class="tx-actions">
                <i data-lucide="pencil" class="action-icon" style="color:#667eea" onclick="openTxModal('${t.type}', ${t.id})"></i>
