@@ -67,10 +67,10 @@ body {
 .chart-header { 
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; cursor: pointer; 
 }
-.chart-header h3 { display: flex; align-items: center; gap: 8px; margin: 0; }
-.chart-total { color: #aaa; font-size: 12px; font-weight: 500; }
-.chart-currency-filter { display: flex; gap: 5px; }
-.curr-filter-btn { padding: 5px 10px; background: rgba(255,255,255,0.05); border-radius: 5px; cursor: pointer; font-size: 12px; color: #888; }
+.chart-header h3 { display: flex; align-items: center; gap: 8px; margin: 0; min-width: 0; }
+.chart-total { color: #aaa; font-size: 12px; font-weight: 500; min-width: 0; }
+.chart-currency-filter { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+.curr-filter-btn { padding: 5px 10px; background: rgba(255,255,255,0.05); border-radius: 5px; cursor: pointer; font-size: 12px; color: #888; white-space: nowrap; text-align: center; }
 .curr-filter-btn.active { background: #667eea; color: white; }
 
 /* Меню категорий */
@@ -109,7 +109,8 @@ body {
 }
 .period-btn.active { background: #667eea; color: white; }
 
-.chart-container { height: 200px; position: relative; margin-bottom: 20px; }
+.chart-container { height: 200px; position: relative; margin-bottom: 12px; max-width: 100%; overflow: hidden; }
+.chart-container canvas { max-width: 100%; }
 
 /* Модалки */
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
@@ -127,7 +128,16 @@ body {
 .dropdown-item { padding: 12px 16px; display: flex; align-items: center; gap: 10px; color: #ccc; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
 @media (min-width: 769px) { .charts-wrapper { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 768px) { body { max-width: 100%; } }
+@media (max-width: 768px) {
+  body { max-width: 100%; }
+  .chart-section { padding: 16px; }
+  .chart-header { display: block; margin-bottom: 10px; }
+  .chart-header h3 { min-height: 24px; }
+  .chart-total { display: block; margin-top: 4px; white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
+  .chart-currency-filter { justify-content: stretch; width: 100%; margin-top: 10px; }
+  .curr-filter-btn { flex: 1 1 0; min-width: 0; padding-left: 6px; padding-right: 6px; }
+  .chart-container { height: 180px; }
+}
 </style>
 </head>
 <body>
@@ -170,7 +180,8 @@ body {
   <!-- РАСХОДЫ -->
   <div class="chart-section" id="section-expense">
     <div class="chart-header" onclick="toggleCategoryMenu('expense')">
-      <h3>Расходы <i data-lucide="chevron-down" style="width:16px;"></i> <span id="exp-chart-total" class="chart-total"></span></h3>
+      <h3>Расходы <i data-lucide="chevron-down" style="width:16px;"></i></h3>
+      <span id="exp-chart-total" class="chart-total"></span>
       <div class="chart-currency-filter">
         <div class="curr-filter-btn" data-chart-currency="ALL" onclick="setChartCurr('expense','ALL'); event.stopPropagation();">Все</div>
         <div class="curr-filter-btn" data-chart-currency="UAH" onclick="setChartCurr('expense','UAH'); event.stopPropagation();">UAH</div>
@@ -194,7 +205,8 @@ body {
   <!-- ДОХОДЫ -->
   <div class="chart-section" id="section-income">
     <div class="chart-header" onclick="toggleCategoryMenu('income')">
-      <h3>Доходы <i data-lucide="chevron-down" style="width:16px;"></i> <span id="inc-chart-total" class="chart-total"></span></h3>
+      <h3>Доходы <i data-lucide="chevron-down" style="width:16px;"></i></h3>
+      <span id="inc-chart-total" class="chart-total"></span>
       <div class="chart-currency-filter">
         <div class="curr-filter-btn" data-chart-currency="ALL" onclick="setChartCurr('income','ALL'); event.stopPropagation();">Все</div>
         <div class="curr-filter-btn" data-chart-currency="UAH" onclick="setChartCurr('income','UAH'); event.stopPropagation();">UAH</div>
