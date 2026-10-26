@@ -140,6 +140,7 @@ body {
 <div class="dropdown-menu" id="main-menu">
   <div class="dropdown-item" onclick="openBalanceModal()">💵 Баланс и Курсы</div>
   <div class="dropdown-item" onclick="exportToCSV()">📊 Экспорт в Excel</div>
+  <div class="dropdown-item" id="demo-data-menu-item" onclick="generateDemoData()" style="display:none;">🧪 Сгенерировать демо-данные</div>
   <div class="dropdown-item" onclick="resetMonth()">🗑️ Обнулить месяц</div>
 </div>
 
@@ -279,10 +280,96 @@ if(!allData[currentMonth]) allData[currentMonth] = [];
 init();
 
 function init() {
+  setupDevelopmentMenu();
   updateMonthUI();
   updateBalanceUI();
   updateCharts();
   lucide.createIcons();
+}
+
+function isLocalDevelopment() {
+  return ['localhost', '127.0.0.1'].includes(window.location.hostname);
+}
+
+function setupDevelopmentMenu() {
+  const menuItem = document.getElementById('demo-data-menu-item');
+  if(menuItem) menuItem.style.display = isLocalDevelopment() ? 'flex' : 'none';
+}
+
+function demoRandom(seed) {
+  let value = seed >>> 0;
+  return () => {
+    value = (value * 1664525 + 1013904223) >>> 0;
+    return value / 4294967296;
+  };
+}
+
+function localDateIso(year, monthIndex, day) {
+  return new Date(year, monthIndex, day, 12, 0, 0).toISOString();
+}
+
+function generateDemoData() {
+  if(!isLocalDevelopment()) return;
+  if(!confirm('Заменить текущие данные реалистичными демо-данными за 6 месяцев?')) return;
+
+  const random = demoRandom(20261026);
+  const expenseCategories = ['Еда', 'Транспорт', 'Жильё', 'Здоровье', 'Развлечения', 'Одежда', 'Прочее'];
+  const incomeCategories = ['Зарплата', 'Фриланс', 'Кэшбэк', 'Подарки'];
+  const expenseDescriptions = ['Продукты', 'Такси', 'Коммунальные услуги', 'Аптека', 'Кино', 'Покупка одежды', 'Ежедневные расходы'];
+  const incomeDescriptions = ['Зарплата', 'Проект', 'Возврат средств', 'Подарок'];
+  const currencies = ['UAH', 'USD', 'EUR'];
+  const generatedData = {};
+  const [currentYear, currentMonthNumber] = currentMonth.split('-').map(Number);
+  let transactionIndex = 0;
+
+  for(let offset = 5; offset >= 0; offset--) {
+    const date = new Date(currentYear, currentMonthNumber - 1 - offset, 1);
+    const year = date.getFullYear();
+    const monthIndex = date.getMonth();
+    const monthKey = `${year}-${String(monthIndex + 1).padStart(2, '0')}`;
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const transactions = [];
+
+    for(let i = 0; i < 12; i++) {
+      const currency = currencies[(i + offset) % currencies.length];
+      const amount = currency === 'UAH' ? 28000 + Math.round(random() * 9000) :
+        currency === 'USD' ? 650 + Math.round(random() * 250) : 550 + Math.round(random() * 220);
+      transactions.push({
+        id: 1700000000000 + transactionIndex++,
+        type: 'income', amount, currency,
+        category: incomeCategories[i % incomeCategories.length],
+        description: incomeDescriptions[i % incomeDescriptions.length],
+        date: localDateIso(year, monthIndex, 1 + Math.floor(random() * Math.min(daysInMonth, 10)))
+      });
+    }
+
+    for(let i = 0; i < 24; i++) {
+      const currency = currencies[(i * 2 + offset) % currencies.length];
+      const amount = currency === 'UAH' ? 250 + Math.round(random() * 1800) :
+        currency === 'USD' ? 12 + Math.round(random() * 90) : 10 + Math.round(random() * 80);
+      transactions.push({
+        id: 1700000000000 + transactionIndex++,
+        type: 'expense', amount, currency,
+        category: expenseCategories[i % expenseCategories.length],
+        description: expenseDescriptions[i % expenseDescriptions.length],
+        date: localDateIso(year, monthIndex, 1 + Math.floor(random() * daysInMonth))
+      });
+    }
+
+    generatedData[monthKey] = transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
+  }
+
+  allData = generatedData;
+  balances = { USD: 1500, UAH: 50000, EUR: 1200 };
+  rates = { USD: 41.5, EUR: 45.0, EUR_USD: 1.08 };
+  localStorage.setItem('finData', JSON.stringify(allData));
+  localStorage.setItem('finBal', JSON.stringify(balances));
+  localStorage.setItem('finRates', JSON.stringify(rates));
+  currentMonth = Object.keys(allData).sort().pop();
+  selectedCat = {expense: '', income: ''};
+  periodFilter = {expense: 'all', income: 'all'};
+  toggleMenu();
+  init();
 }
 
 function formatMoney(amount, curr) {
