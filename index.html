@@ -556,7 +556,10 @@ function setChartCurr(type, c) {
     else btn.classList.remove('active');
   });
   
-  updateCharts();
+  const canvasId = type === 'expense' ? 'expChart' : 'incChart';
+  const chartInstance = type === 'expense' ? expChart : incChart;
+  const setChart = type === 'expense' ? (chart) => expChart = chart : (chart) => incChart = chart;
+  renderChart(type, canvasId, chartInstance, setChart);
 }
 
 function toggleCategoryMenu(type) {
