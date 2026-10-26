@@ -131,9 +131,9 @@ body {
 @media (max-width: 768px) {
   body { max-width: 100%; }
   .chart-section { padding: 16px; }
-  .chart-header { display: block; margin-bottom: 10px; }
-  .chart-header h3 { min-height: 24px; }
-  .chart-total { display: block; margin-top: 4px; white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
+  .chart-header { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 10px; }
+  .chart-header h3 { flex: 0 0 auto; min-height: 24px; }
+  .chart-total { flex: 0 1 auto; max-width: 100%; margin-top: 0; white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
   .chart-currency-filter { justify-content: stretch; width: 100%; margin-top: 10px; }
   .curr-filter-btn { flex: 1 1 0; min-width: 0; padding-left: 6px; padding-right: 6px; }
   .chart-container { height: 180px; }
