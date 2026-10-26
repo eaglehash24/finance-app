@@ -68,6 +68,7 @@ body {
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; cursor: pointer; 
 }
 .chart-header h3 { display: flex; align-items: center; gap: 8px; margin: 0; }
+.chart-total { color: #aaa; font-size: 12px; font-weight: 500; }
 .chart-currency-filter { display: flex; gap: 5px; }
 .curr-filter-btn { padding: 5px 10px; background: rgba(255,255,255,0.05); border-radius: 5px; cursor: pointer; font-size: 12px; color: #888; }
 .curr-filter-btn.active { background: #667eea; color: white; }
@@ -169,9 +170,10 @@ body {
   <!-- РАСХОДЫ -->
   <div class="chart-section" id="section-expense">
     <div class="chart-header" onclick="toggleCategoryMenu('expense')">
-      <h3>Расходы <i data-lucide="chevron-down" style="width:16px;"></i></h3>
+      <h3>Расходы <i data-lucide="chevron-down" style="width:16px;"></i> <span id="exp-chart-total" class="chart-total"></span></h3>
       <div class="chart-currency-filter">
-        <div class="curr-filter-btn active" onclick="setChartCurr('expense','UAH'); event.stopPropagation();">UAH</div>
+        <div class="curr-filter-btn active" onclick="setChartCurr('expense','ALL'); event.stopPropagation();">Все</div>
+        <div class="curr-filter-btn" onclick="setChartCurr('expense','UAH'); event.stopPropagation();">UAH</div>
         <div class="curr-filter-btn" onclick="setChartCurr('expense','USD'); event.stopPropagation();">USD</div>
         <div class="curr-filter-btn" onclick="setChartCurr('expense','EUR'); event.stopPropagation();">EUR</div>
       </div>
@@ -192,9 +194,10 @@ body {
   <!-- ДОХОДЫ -->
   <div class="chart-section" id="section-income">
     <div class="chart-header" onclick="toggleCategoryMenu('income')">
-      <h3>Доходы <i data-lucide="chevron-down" style="width:16px;"></i></h3>
+      <h3>Доходы <i data-lucide="chevron-down" style="width:16px;"></i> <span id="inc-chart-total" class="chart-total"></span></h3>
       <div class="chart-currency-filter">
-        <div class="curr-filter-btn active" onclick="setChartCurr('income','UAH'); event.stopPropagation();">UAH</div>
+        <div class="curr-filter-btn active" onclick="setChartCurr('income','ALL'); event.stopPropagation();">Все</div>
+        <div class="curr-filter-btn" onclick="setChartCurr('income','UAH'); event.stopPropagation();">UAH</div>
         <div class="curr-filter-btn" onclick="setChartCurr('income','USD'); event.stopPropagation();">USD</div>
         <div class="curr-filter-btn" onclick="setChartCurr('income','EUR'); event.stopPropagation();">EUR</div>
       </div>
@@ -267,7 +270,7 @@ let allData = JSON.parse(localStorage.getItem('finData')) || {};
 let balances = JSON.parse(localStorage.getItem('finBal')) || {USD:0, UAH:0, EUR:0};
 let rates = JSON.parse(localStorage.getItem('finRates')) || {USD:41.5, EUR:45.0, EUR_USD:1.08};
 let currentMonth = new Date().toISOString().slice(0, 7);
-let chartCurr = {expense: 'UAH', income: 'UAH'};
+let chartCurr = {expense: 'ALL', income: 'ALL'};
 let expChart = null, incChart = null;
 let selectedCat = {expense: '', income: ''};
 let periodFilter = {expense: 'all', income: 'all'};
@@ -376,6 +379,14 @@ function formatMoney(amount, curr) {
   const sym = curr === 'USD' ? '$' : curr === 'UAH' ? '₴' : '€';
   const formatted = amount.toFixed(2).replace(/\d(?=(\d{3})+(?!\d))/g, "$& ").replace('.', ',');
   return `${sym} ${formatted}`;
+}
+
+function convertToBaseCurrency(amount, currency) {
+  // Rates are configured as UAH per 1 USD/EUR.
+  if(currency === 'UAH') return amount;
+  if(currency === 'USD') return amount * rates.USD;
+  if(currency === 'EUR') return amount * rates.EUR;
+  throw new Error(`Unsupported currency: ${currency}`);
 }
 
 function updateBalanceUI() {
@@ -573,7 +584,9 @@ function toggleCategoryMenu(type) {
 }
 
 function updateCategoryMenu(type) {
-  const txs = (allData[currentMonth] || []).filter(t => t.type === type && t.currency === chartCurr[type]);
+  const txs = (allData[currentMonth] || []).filter(t =>
+    t.type === type && (chartCurr[type] === 'ALL' || t.currency === chartCurr[type])
+  );
   const cats = [...new Set(txs.map(t => t.category))];
   const menu = document.getElementById(type === 'expense' ? 'exp-cat-menu' : 'inc-cat-menu');
   let html = `<div class="cat-option" onclick="selectCategory('${type}', '')">📊 Назад к графику</div>`;
@@ -611,7 +624,10 @@ function setPeriodFilter(type, period) {
 function renderGroupedList(type, category) {
   const container = document.getElementById(type === 'expense' ? 'exp-list' : 'inc-list');
   const now = new Date();
-  let txs = (allData[currentMonth] || []).filter(t => t.type === type && t.category === category && t.currency === chartCurr[type]);
+  let txs = (allData[currentMonth] || []).filter(t =>
+    t.type === type && t.category === category &&
+    (chartCurr[type] === 'ALL' || t.currency === chartCurr[type])
+  );
   
   if(periodFilter[type] === 'today') txs = txs.filter(t => new Date(t.date).toDateString() === now.toDateString());
   else if(periodFilter[type] === 'week') {
@@ -663,12 +679,24 @@ function updateCharts() {
 
 function renderChart(type, canvasId, chartInstance, setChart) {
   const ctx = document.getElementById(canvasId).getContext('2d');
-  const txs = (allData[currentMonth] || []).filter(t => t.type === type && t.currency === chartCurr[type]);
+  const txs = (allData[currentMonth] || []).filter(t =>
+    t.type === type && (chartCurr[type] === 'ALL' || t.currency === chartCurr[type])
+  );
   const byCat = {};
-  const total = txs.reduce((s,t) => s+t.amount, 0);
-  txs.forEach(t => byCat[t.category] = (byCat[t.category] || 0) + t.amount);
+  let total = 0;
+  txs.forEach(t => {
+    const amount = chartCurr[type] === 'ALL' ? convertToBaseCurrency(t.amount, t.currency) : t.amount;
+    total += amount;
+    byCat[t.category] = (byCat[t.category] || 0) + amount;
+  });
+  const totalElement = document.getElementById(type === 'expense' ? 'exp-chart-total' : 'inc-chart-total');
+  totalElement.textContent = chartCurr[type] === 'ALL' ? `Итого: ${formatMoney(total, 'UAH')}` : '';
   if(chartInstance) chartInstance.destroy();
-  const labels = Object.keys(byCat).map(k => `${k} (${total > 0 ? ((byCat[k]/total)*100).toFixed(0) : 0}%)`);
+  const labels = Object.keys(byCat).map(k => {
+    const percentage = total > 0 ? ((byCat[k] / total) * 100).toFixed(0) : 0;
+    const amount = chartCurr[type] === 'ALL' ? `, ${formatMoney(byCat[k], 'UAH')}` : '';
+    return `${k} (${percentage}%${amount})`;
+  });
   const newChart = new Chart(ctx, {
     type: 'doughnut',
     data: { labels: labels, datasets: [{ data: Object.values(byCat), backgroundColor: ['#667eea','#764ba2','#00FF88','#FF6B6B','#FFC107','#00BCD4'], borderWidth: 0 }] },
